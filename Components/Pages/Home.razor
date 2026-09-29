@@ -1,0 +1,107 @@
+@page "/"
+@inject AuthService Auth
+@inject UiState Ui
+
+<PageTitle>Home · DevLogs</PageTitle>
+
+<section class="hello">
+    <h1>@Greeting, @Auth.Current?.Username</h1>
+    <p class="muted">Here's your workspace. Capture something, or pick up a recent log.</p>
+</section>
+
+<section class="stats" aria-label="This week at a glance">
+    <div><strong>12</strong><span>logs this week</span></div>
+    <div><strong>48</strong><span>snippets saved</span></div>
+    <div><strong>3</strong><span>open bugs</span></div>
+    <div><strong>5 days</strong><span>logging streak</span></div>
+</section>
+
+<div class="grid">
+    <div class="col">
+        <section class="panel">
+            <h2>Quick capture</h2>
+            <div class="chips" role="group" aria-label="Entry type">
+                @foreach (var k in Kinds)
+                {
+                    <button class="chip @(kind == k ? "on" : "")" aria-pressed="@(kind == k ? "true" : "false")" @onclick="() => kind = k">@k</button>
+                }
+            </div>
+            <textarea class="capture" rows="3" @bind="draft" @bind:event="oninput"
+                      placeholder="What did you just figure out, fix, or break?"></textarea>
+            <div class="capture-foot">
+                <span class="muted">Markdown supported soon</span>
+                <button class="btn primary" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick='() => Ui.Show("Saving logs")'>Save @kind.ToLower()</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Recent logs</h2>
+                <button class="link" @onclick='() => Ui.Show("Logs")'>View all</button>
+            </div>
+            <ul class="entries">
+                @foreach (var e in Recent)
+                {
+                    <li>
+                        <button class="entry" @onclick='() => Ui.Show("Log viewer")'>
+                            <b class="kind k-@e.Kind">@e.Kind</b>
+                            <span class="entry-main">
+                                <span class="entry-title">@e.Title</span>
+                                <span class="muted">@e.Project · @e.When</span>
+                            </span>
+                            <span class="tags">@foreach (var t in e.Tags) { <em>#@t</em> }</span>
+                        </button>
+                    </li>
+                }
+            </ul>
+            <p class="sample">Sample data for preview</p>
+        </section>
+    </div>
+
+    <div class="col">
+        <section class="panel">
+            <h2>Your last 18 weeks</h2>
+            <div class="heat" role="img" aria-label="Activity heatmap">
+                @foreach (var level in Cells) { <i class="c@(level)"></i> }
+            </div>
+            <div class="legend"><span>Less</span><i class="c0"></i><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><span>More</span></div>
+        </section>
+
+        <section class="panel">
+            <h2>Jump to</h2>
+            <div class="chips">
+                @foreach (var t in Tags)
+                {
+                    <button class="chip" @onclick="() => Ui.Show(t)">#@t</button>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+@code {
+    record Entry(string Kind, string Title, string Project, string When, string[] Tags);
+
+    static readonly string[] Kinds = ["Log", "Fix", "Snippet", "Idea"];
+    static readonly string[] Tags = ["netcode", "performance", "auth", "async", "ui"];
+
+    static readonly Entry[] Recent =
+    [
+        new("fix", "Race condition in matchmaking queue", "arcade-api", "12 min ago", ["netcode"]),
+        new("note", "Why chunk loading stutters on low-end GPUs", "web-client", "2 h ago", ["performance"]),
+        new("snippet", "Debounced async input handler", "toolkit", "Yesterday", ["async"]),
+        new("idea", "Replay viewer for finished matches", "arcade-api", "2 days ago", ["ui"]),
+        new("bug", "Token not refreshed after laptop sleep", "web-client", "3 days ago", ["auth"]),
+    ];
+
+    static readonly int[] Cells = Enumerable.Range(0, 7 * 18).Select(i =>
+    {
+        var r = new Random(i * 31 + 7).Next(0, 10);
+        return r < 4 ? 0 : r < 6 ? 1 : r < 8 ? 2 : r < 9 ? 3 : 4;
+    }).ToArray();
+
+    string kind = "Log";
+    string draft = "";
+
+    static string Greeting => DateTime.Now.Hour switch { < 12 => "Good morning", < 18 => "Good afternoon", _ => "Good evening" };
+}

@@ -1,0 +1,54 @@
+@inherits LayoutComponentBase
+@inject AuthService Auth
+@inject NavigationManager Nav
+@inject UiState Ui
+
+@if (Auth.IsAuthenticated)
+{
+    <div class="shell">
+        <nav class="side" aria-label="Main">
+            <a class="brand" href="/"><span class="mark"></span>DevLogs</a>
+            <div class="nav-list">
+                <NavLink class="nav-item" href="/" Match="NavLinkMatch.All"><span class="ico">⌂</span>Home</NavLink>
+                @foreach (var (icon, label) in Items)
+                {
+                    <button class="nav-item" @onclick="() => Ui.Show(label)"><span class="ico">@icon</span>@label</button>
+                }
+            </div>
+            <div class="side-foot">
+                <span class="avatar">@(Auth.Current!.Username[..1].ToUpper())</span>
+                <span class="who">@Auth.Current.Username</span>
+                <button class="link" @onclick="SignOut">Sign out</button>
+            </div>
+        </nav>
+        <div class="main">
+            <header class="top">
+                <button class="search" @onclick='() => Ui.Show("Search")'>
+                    <span>Search logs, snippets, tags</span><kbd>Ctrl K</kbd>
+                </button>
+                <button class="btn primary" @onclick='() => Ui.Show("New log")'>+ New log</button>
+            </header>
+            <div class="content">@Body</div>
+        </div>
+    </div>
+}
+<UnderDevModal />
+
+@code {
+    static readonly (string Icon, string Label)[] Items =
+    [
+        ("≡", "Logs"), ("{ }", "Snippets"), ("⚑", "Bug tracker"),
+        ("#", "Tags"), ("◷", "Timeline"), ("⚙", "Settings")
+    ];
+
+    protected override void OnInitialized()
+    {
+        if (!Auth.IsAuthenticated) Nav.NavigateTo("/login");
+    }
+
+    void SignOut()
+    {
+        Auth.SignOut();
+        Nav.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,67 @@
+@page "/login"
+@layout AuthLayout
+@inject AuthService Auth
+@inject NavigationManager Nav
+@inject UiState Ui
+
+<PageTitle>Sign in · DevLogs</PageTitle>
+<h1>Welcome back</h1>
+<p class="muted">Sign in to pick up your logs where you left off.</p>
+
+<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="login" class="form">
+    <DataAnnotationsValidator />
+    @if (error is not null) { <div class="alert" role="alert">@error</div> }
+
+    <label class="field">
+        <span>Username or email</span>
+        <InputText @bind-Value="model.Id" autocomplete="username" placeholder="you@devlogs.dev" />
+        <ValidationMessage For="() => model.Id" />
+    </label>
+
+    <div class="field">
+        <div class="field-row">
+            <label for="login-password">Password</label>
+            <button type="button" class="link" @onclick='() => Ui.Show("Password reset")'>Forgot password?</button>
+        </div>
+        <span class="pw">
+            <InputText id="login-password" @bind-Value="model.Password" type="@(showPw ? "text" : "password")" autocomplete="current-password" />
+            <button type="button" class="link" aria-controls="login-password" aria-pressed="@(showPw ? "true" : "false")"
+                    aria-label="@(showPw ? "Hide password" : "Show password")" @onclick="() => showPw = !showPw">
+                @(showPw ? "Hide" : "Show")
+            </button>
+        </span>
+        <ValidationMessage For="() => model.Password" />
+    </div>
+
+    <button class="btn primary block" disabled="@busy">@(busy ? "Signing in…" : "Sign in")</button>
+    <div class="divider"><span>or</span></div>
+    <button type="button" class="btn ghost block" @onclick='() => Ui.Show("GitHub sign-in")'>Continue with GitHub</button>
+</EditForm>
+
+<p class="switch">New to DevLogs? <a href="/register">Create an account</a></p>
+
+@code {
+    class LoginModel
+    {
+        [Required(ErrorMessage = "Enter your username or email.")] public string Id { get; set; } = "";
+        [Required(ErrorMessage = "Enter your password.")] public string Password { get; set; } = "";
+    }
+
+    readonly LoginModel model = new();
+    bool busy, showPw;
+    string? error;
+
+    protected override void OnInitialized()
+    {
+        if (Auth.IsAuthenticated) Nav.NavigateTo("/");
+    }
+
+    async Task SubmitAsync()
+    {
+        if (busy) return;
+        busy = true; error = null;
+        var (ok, err) = await Auth.LoginAsync(model.Id.Trim(), model.Password);
+        busy = false;
+        if (ok) Nav.NavigateTo("/"); else error = err;
+    }
+}

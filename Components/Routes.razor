@@ -1,0 +1,12 @@
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(AuthLayout)">
+            <h1>Page not found</h1>
+            <p class="muted">That address doesn't exist in DevLogs.</p>
+            <a class="btn primary" href="/">Back to home</a>
+        </LayoutView>
+    </NotFound>
+</Router>

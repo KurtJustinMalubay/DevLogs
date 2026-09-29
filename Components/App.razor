@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <HeadOutlet @rendermode="Mode" />
+    <title>DevLogs</title>
+</head>
+<body>
+    <Routes @rendermode="Mode" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
+
+@code {
+    static readonly IComponentRenderMode Mode = new InteractiveServerRenderMode(prerender: false);
+}

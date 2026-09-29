@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+
+<div class="auth">
+    <aside class="auth-brand">
+        <a class="brand" href="/"><span class="mark"></span>DevLogs</a>
+        <div>
+            <h2 class="auth-tagline">Write it down while it's fresh.</h2>
+            <p class="muted">One calm place for your dev notes, fixes, snippets and ideas.</p>
+        </div>
+        <div class="stream" aria-hidden="true">
+            <p><time>09:12</time><b class="k-fix">fix</b>Race in matchmaking queue</p>
+            <p><time>10:40</time><b class="k-snippet">snippet</b>Debounced async handler</p>
+            <p><time>13:05</time><b class="k-idea">idea</b>Replay viewer for matches</p>
+            <p><time>16:21</time><b class="k-note">note</b>Why chunk loading stutters</p>
+        </div>
+    </aside>
+    <main class="auth-panel">
+        <div class="auth-card">@Body</div>
+    </main>
+</div>
+<UnderDevModal />

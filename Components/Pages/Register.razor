@@ -1,0 +1,114 @@
+@page "/register"
+@layout AuthLayout
+@inject AuthService Auth
+@inject NavigationManager Nav
+@inject UiState Ui
+
+<PageTitle>Create account · DevLogs</PageTitle>
+<h1>Create your account</h1>
+<p class="muted">Free while we build. Takes about 20 seconds.</p>
+
+<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="register" class="form">
+    <DataAnnotationsValidator />
+    @if (error is not null) { <div class="alert" role="alert">@error</div> }
+
+    <label class="field">
+        <span>Username</span>
+        <InputText @bind-Value="model.Username" autocomplete="username" placeholder="ada_dev" />
+        <ValidationMessage For="() => model.Username" />
+    </label>
+
+    <label class="field">
+        <span>Email</span>
+        <InputText @bind-Value="model.Email" type="email" autocomplete="email" placeholder="you@devlogs.dev" />
+        <ValidationMessage For="() => model.Email" />
+    </label>
+
+    <div class="field">
+        <label for="register-password">Password</label>
+        <span class="pw">
+            <InputText id="register-password" @bind-Value="model.Password"
+                       type="@(showPw ? "text" : "password")" autocomplete="new-password" />
+            <button type="button" class="link" aria-controls="register-password" aria-pressed="@(showPw ? "true" : "false")"
+                    aria-label="@(showPw ? "Hide password" : "Show password")" @onclick="() => showPw = !showPw">
+                @(showPw ? "Hide" : "Show")
+            </button>
+        </span>
+        <span class="meter" aria-hidden="true">
+            @for (var i = 1; i <= 4; i++) { <i class="@(i <= Strength ? "on s" + Strength : "")"></i> }
+        </span>
+        <ValidationMessage For="() => model.Password" />
+    </div>
+
+    <div class="field">
+        <label for="register-confirm-password">Confirm password</label>
+        <span class="pw">
+            <InputText id="register-confirm-password" @bind-Value="model.Confirm" type="@(showConfirmPw ? "text" : "password")" autocomplete="new-password" />
+            <button type="button" class="link" aria-controls="register-confirm-password" aria-pressed="@(showConfirmPw ? "true" : "false")"
+                    aria-label="@(showConfirmPw ? "Hide confirmation password" : "Show confirmation password")"
+                    @onclick="() => showConfirmPw = !showConfirmPw">
+                @(showConfirmPw ? "Hide" : "Show")
+            </button>
+        </span>
+        <ValidationMessage For="() => model.Confirm" />
+    </div>
+
+    <button class="btn primary block" disabled="@busy">@(busy ? "Creating account…" : "Create account")</button>
+    <div class="divider"><span>or</span></div>
+    <button type="button" class="btn ghost block" @onclick='() => Ui.Show("GitHub sign-up")'>Sign up with GitHub</button>
+</EditForm>
+
+<p class="switch">Already have an account? <a href="/login">Sign in</a></p>
+
+@code {
+    class RegisterModel
+    {
+        [Required(ErrorMessage = "Choose a username.")]
+        [StringLength(24, MinimumLength = 3, ErrorMessage = "Use 3 to 24 characters.")]
+        [RegularExpression("^[A-Za-z0-9_-]+$", ErrorMessage = "Letters, numbers, - and _ only.")]
+        public string Username { get; set; } = "";
+
+        [Required(ErrorMessage = "Enter your email.")]
+        [EmailAddress(ErrorMessage = "That doesn't look like an email address.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Choose a password.")]
+        [MinLength(8, ErrorMessage = "Use at least 8 characters.")]
+        public string Password { get; set; } = "";
+
+        [Required(ErrorMessage = "Confirm your password.")]
+        [Compare(nameof(Password), ErrorMessage = "Passwords don't match.")]
+        public string Confirm { get; set; } = "";
+    }
+
+    readonly RegisterModel model = new();
+    bool busy, showPw, showConfirmPw;
+    string? error;
+
+    int Strength
+    {
+        get
+        {
+            var p = model.Password;
+            if (p.Length == 0) return 0;
+            var s = (p.Length >= 8 ? 1 : 0) + (p.Length >= 12 ? 1 : 0)
+                  + (p.Any(char.IsUpper) && p.Any(char.IsLower) ? 1 : 0)
+                  + (p.Any(char.IsDigit) && p.Any(c => !char.IsLetterOrDigit(c)) ? 1 : 0);
+            return Math.Max(1, s);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (Auth.IsAuthenticated) Nav.NavigateTo("/");
+    }
+
+    async Task SubmitAsync()
+    {
+        if (busy) return;
+        busy = true; error = null;
+        var (ok, err) = await Auth.RegisterAsync(model.Username.Trim(), model.Email.Trim(), model.Password);
+        busy = false;
+        if (ok) Nav.NavigateTo("/"); else error = err;
+    }
+}
