@@ -10,6 +10,7 @@
             <a class="flex items-center gap-[.6rem] font-bold text-[1.15rem] text-[#e8eefb] tracking-[-.02em] hover:no-underline" href="/"><span class="w-[10px] h-[22px] bg-[#5eead4] rounded-[3px] shadow-[14px_0_0_-3px_#5eead4] mr-[.6rem]"></span>DevLogs</a>
             <div class="grid gap-[2px]">
                 <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/" Match="NavLinkMatch.All"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⌂</span>Home</NavLink>
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/logs"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">≡</span>Logs</NavLink>
                 @foreach (var (icon, label) in Items)
                 {
                     <button class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" @onclick="() => Ui.Show(label)"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">@icon</span>@label</button>
@@ -37,7 +38,7 @@
 @code {
     static readonly (string Icon, string Label)[] Items =
     [
-        ("≡", "Logs"), ("{ }", "Snippets"), ("⚑", "Bug tracker"),
+        ("{ }", "Snippets"), ("⚑", "Bug tracker"),
         ("#", "Tags"), ("◷", "Timeline"), ("⚙", "Settings")
     ];
 

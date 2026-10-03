@@ -1,0 +1,62 @@
+@page "/logs"
+@inject AuthService Auth
+
+<PageTitle>All Logs · DevLogs</PageTitle>
+
+<div class="mb-[1.6rem]">
+    <h1 class="text-[1.75rem] font-bold leading-[1.2] mb-[0.4rem] tracking-[-0.02em]">All Logs</h1>
+    <p class="text-[#8b9dbf] mb-[1rem]">Browse and filter through your entire logging history.</p>
+</div>
+
+<div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
+    <div class="flex flex-wrap gap-[0.5rem] mb-[0.9rem]">
+        <button class="px-[0.8rem] py-[0.3rem] border border-[#5eead4] bg-[#5eead4] text-[#04211d] font-semibold rounded-full text-[0.85rem]">All</button>
+        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Logs</button>
+        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Bugs</button>
+        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Snippets</button>
+    </div>
+
+    <ul class="grid gap-[2px] -mx-[0.5rem]">
+        @foreach (var e in AllLogs)
+        {
+            <li>
+                <button class="grid grid-cols-[4.2rem_1fr_auto] gap-[0.9rem] items-center w-full text-left p-[0.7rem_0.5rem] rounded-[8px] hover:bg-[#1a2843]">
+                    <b class="font-mono font-semibold text-[0.8rem] @GetKindClass(e.Kind)">@e.Kind</b>
+                    <span class="grid min-w-0">
+                        <span class="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">@e.Title</span>
+                        <span class="text-[0.82rem] text-[#8b9dbf]">@e.Project · @e.When</span>
+                    </span>
+                    <span class="flex gap-[0.5rem] text-[#8b9dbf] font-mono text-[0.78rem]">
+                        @foreach (var t in e.Tags) { <span>#@t</span> }
+                    </span>
+                </button>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    record Entry(string Kind, string Title, string Project, string When, string[] Tags);
+
+    static readonly Entry[] AllLogs =
+    [
+        new("fix", "Race condition in matchmaking queue", "arcade-api", "12 min ago", ["netcode"]),
+        new("note", "Why chunk loading stutters on low-end GPUs", "web-client", "2 h ago", ["performance"]),
+        new("snippet", "Debounced async input handler", "toolkit", "Yesterday", ["async"]),
+        new("idea", "Replay viewer for finished matches", "arcade-api", "2 days ago", ["ui"]),
+        new("bug", "Token not refreshed after laptop sleep", "web-client", "3 days ago", ["auth"]),
+        new("log", "Set up Tailwind CSS configuration", "devlogs-web", "4 days ago", ["css", "ui"]),
+        new("fix", "Null reference in user profile loading", "arcade-api", "5 days ago", ["backend"]),
+    ];
+
+    string GetKindClass(string kind) => kind switch
+    {
+        "fix" => "text-[#ff9f7a]",
+        "note" => "text-[#82a8ff]",
+        "snippet" => "text-[#c4a1ff]",
+        "idea" => "text-[#f5cd63]",
+        "bug" => "text-[#ff7a8a]",
+        "log" => "text-[#5eead4]",
+        _ => "text-[#8b9dbf]"
+    };
+}
