@@ -1,6 +1,9 @@
 @page "/"
 @inject AuthService Auth
 @inject UiState Ui
+@inject LogService LogService
+@inject NavigationManager Nav
+@implements IDisposable
 
 <PageTitle>Home · DevLogs</PageTitle>
 
@@ -30,14 +33,14 @@
                       placeholder="What did you just figure out, fix, or break?"></textarea>
             <div class="flex justify-between items-center mt-[.8rem] text-[.85rem]">
                 <span class="text-[#8b9dbf]">Markdown supported soon</span>
-                <button class="inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 hover:not(:disabled):no-underline disabled:opacity-45 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick='() => Ui.Show("Saving logs")'>Save @kind.ToLower()</button>
+                <button class="inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 hover:not(:disabled):no-underline disabled:opacity-45 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick="SaveLog">Save @kind.ToLower()</button>
             </div>
         </section>
 
         <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
             <div class="flex justify-between items-baseline">
                 <h2>Recent logs</h2>
-                <button class="text-[#5eead4] text-[.875rem] hover:underline" @onclick='() => Ui.Show("Logs")'>View all</button>
+                <button class="text-[#5eead4] text-[.875rem] hover:underline" @onclick='() => Nav.NavigateTo("/logs")'>View all</button>
             </div>
             <ul class="grid gap-[2px] m-[0_-.5rem]">
                 @foreach (var e in Recent)
@@ -47,7 +50,7 @@
                             <b class="font-semibold text-[.8rem] font-[var(--mono)] @(e.Kind switch { "log" => "text-[#5eead4]", "fix" => "text-[#ff9f7a]", "note" => "text-[#82a8ff]", "snippet" => "text-[#c4a1ff]", "idea" => "text-[#f5cd63]", "bug" => "text-[#ff7a8a]", _ => "" })">@e.Kind</b>
                             <span class="grid min-w-0">
                                 <span class="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">@e.Title</span>
-                                <span class="text-[#8b9dbf] text-[.82rem]">@e.Project · @e.When</span>
+                                <span class="text-[#8b9dbf] text-[.82rem]">@e.Project · @GetTimeAgo(e.CreatedAt)</span>
                             </span>
                             <span class="flex gap-[.5rem] text-[#8b9dbf] text-[.78rem] font-[var(--mono)]">@foreach (var t in e.Tags) { <em class="not-italic">#@t</em> }</span>
                         </button>
@@ -80,19 +83,10 @@
 </div>
 
 @code {
-    record Entry(string Kind, string Title, string Project, string When, string[] Tags);
-
     static readonly string[] Kinds = ["Log", "Fix", "Snippet", "Idea"];
     static readonly string[] Tags = ["netcode", "performance", "auth", "async", "ui"];
 
-    static readonly Entry[] Recent =
-    [
-        new("fix", "Race condition in matchmaking queue", "arcade-api", "12 min ago", ["netcode"]),
-        new("note", "Why chunk loading stutters on low-end GPUs", "web-client", "2 h ago", ["performance"]),
-        new("snippet", "Debounced async input handler", "toolkit", "Yesterday", ["async"]),
-        new("idea", "Replay viewer for finished matches", "arcade-api", "2 days ago", ["ui"]),
-        new("bug", "Token not refreshed after laptop sleep", "web-client", "3 days ago", ["auth"]),
-    ];
+    IEnumerable<LogEntry> Recent => LogService.GetRecentLogs(5);
 
     static readonly int[] Cells = Enumerable.Range(0, 7 * 18).Select(i =>
     {
@@ -103,5 +97,25 @@
     string kind = "Log";
     string draft = "";
 
+    void SaveLog()
+    {
+        if (string.IsNullOrWhiteSpace(draft)) return;
+        LogService.AddLog(kind, draft);
+        draft = "";
+    }
+
     static string Greeting => DateTime.Now.Hour switch { < 12 => "Good morning", < 18 => "Good afternoon", _ => "Good evening" };
+
+    string GetTimeAgo(DateTime time) 
+    {
+        var span = DateTime.Now - time;
+        if (span.TotalMinutes < 1) return "Just now";
+        if (span.TotalHours < 1) return $"{(int)span.TotalMinutes} min ago";
+        if (span.TotalDays < 1) return $"{(int)span.TotalHours} h ago";
+        return $"{(int)span.TotalDays} days ago";
+    }
+
+    protected override void OnInitialized() => LogService.OnLogAdded += Refresh;
+    void Refresh() => InvokeAsync(StateHasChanged);
+    public void Dispose() => LogService.OnLogAdded -= Refresh;
 }

@@ -1,0 +1,57 @@
+@inject UiState Ui
+@inject LogService LogService
+@inject NavigationManager Nav
+@implements IDisposable
+
+@if (Ui.Feature == "New log")
+{
+    <div class="fixed inset-0 bg-[#040810]/70 grid place-items-center p-4 z-50 animate-[fade_0.15s_ease-out]" @onclick="Ui.Close">
+        <div class="w-full max-w-[540px] bg-[#131e32] border border-[#243452] rounded-[14px] p-6 shadow-[0_24px_60px_rgba(0,0,0,0.5)] animate-[pop_0.18s_ease-out]" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-[1.2rem] font-semibold m-0">Create new log</h2>
+                <button class="text-[#8b9dbf] hover:text-[#e8eefb] text-xl leading-none" @onclick="Ui.Close">×</button>
+            </div>
+            
+            <div class="flex flex-wrap gap-[0.5rem] mb-4">
+                @foreach (var k in Kinds)
+                {
+                    <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] rounded-[999px] text-[0.85rem] hover:text-[#e8eefb] hover:border-[#3a5078] @(kind == k ? "bg-[#5eead4] border-[#5eead4] text-[#04211d] font-semibold" : "text-[#8b9dbf]")" @onclick="() => kind = k">@k</button>
+                }
+            </div>
+
+            <textarea class="w-full resize-y min-h-[140px] p-[0.8rem_0.9rem] bg-[#0d1524] border border-[#243452] rounded-[10px] text-[#e8eefb] font-inherit focus:outline-none focus:border-[#5eead4] mb-5" rows="4" @bind="draft" @bind:event="oninput" placeholder="What did you just figure out, fix, or break? Use #tags for organization!"></textarea>
+
+            <div class="flex justify-end gap-3">
+                <button class="px-4 py-2 rounded-[10px] text-[0.9rem] font-semibold text-[#8b9dbf] hover:bg-[#1a2843]" @onclick="Ui.Close">Cancel</button>
+                <button class="px-4 py-2 rounded-[10px] text-[0.9rem] font-semibold transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 disabled:opacity-45 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick="SaveLog">Save @kind.ToLower()</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    static readonly string[] Kinds = ["Log", "Fix", "Snippet", "Idea"];
+    string kind = "Log";
+    string draft = "";
+
+    protected override void OnInitialized() => Ui.Changed += Refresh;
+    
+    void Refresh() 
+    {
+        if (Ui.Feature == "New log")
+        {
+            kind = "Log";
+            draft = "";
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() => Ui.Changed -= Refresh;
+
+    void SaveLog()
+    {
+        if (string.IsNullOrWhiteSpace(draft)) return;
+        LogService.AddLog(kind, draft);
+        Ui.Close();
+    }
+}

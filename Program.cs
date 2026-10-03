@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UiState>();
+builder.Services.AddSingleton<LogService>();
 
 var app = builder.Build();
 app.UseStaticFiles();

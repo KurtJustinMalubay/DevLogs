@@ -1,5 +1,7 @@
 @page "/logs"
 @inject AuthService Auth
+@inject LogService LogService
+@implements IDisposable
 
 <PageTitle>All Logs · DevLogs</PageTitle>
 
@@ -10,21 +12,22 @@
 
 <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
     <div class="flex flex-wrap gap-[0.5rem] mb-[0.9rem]">
-        <button class="px-[0.8rem] py-[0.3rem] border border-[#5eead4] bg-[#5eead4] text-[#04211d] font-semibold rounded-full text-[0.85rem]">All</button>
-        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Logs</button>
-        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Bugs</button>
-        <button class="px-[0.8rem] py-[0.3rem] border border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078] rounded-full text-[0.85rem]">Snippets</button>
+        @foreach (var filter in new[] { "All", "Logs", "Bugs", "Snippets" })
+        {
+            var isSelected = activeFilter == filter;
+            <button class="px-[0.8rem] py-[0.3rem] border rounded-full text-[0.85rem] transition-colors @(isSelected ? "border-[#5eead4] bg-[#5eead4] text-[#04211d] font-semibold" : "border-[#243452] text-[#8b9dbf] hover:text-[#e8eefb] hover:border-[#3a5078]")" @onclick="() => activeFilter = filter">@filter</button>
+        }
     </div>
 
     <ul class="grid gap-[2px] -mx-[0.5rem]">
-        @foreach (var e in AllLogs)
+        @foreach (var e in LogService.GetAllLogs().Where(l => activeFilter == "All" || l.Kind.Equals(activeFilter.TrimEnd('s'), StringComparison.OrdinalIgnoreCase)))
         {
             <li>
                 <button class="grid grid-cols-[4.2rem_1fr_auto] gap-[0.9rem] items-center w-full text-left p-[0.7rem_0.5rem] rounded-[8px] hover:bg-[#1a2843]">
                     <b class="font-mono font-semibold text-[0.8rem] @GetKindClass(e.Kind)">@e.Kind</b>
                     <span class="grid min-w-0">
                         <span class="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">@e.Title</span>
-                        <span class="text-[0.82rem] text-[#8b9dbf]">@e.Project · @e.When</span>
+                        <span class="text-[0.82rem] text-[#8b9dbf]">@e.Project · @e.CreatedAt.ToString("MMM dd")</span>
                     </span>
                     <span class="flex gap-[0.5rem] text-[#8b9dbf] font-mono text-[0.78rem]">
                         @foreach (var t in e.Tags) { <span>#@t</span> }
@@ -36,18 +39,7 @@
 </div>
 
 @code {
-    record Entry(string Kind, string Title, string Project, string When, string[] Tags);
-
-    static readonly Entry[] AllLogs =
-    [
-        new("fix", "Race condition in matchmaking queue", "arcade-api", "12 min ago", ["netcode"]),
-        new("note", "Why chunk loading stutters on low-end GPUs", "web-client", "2 h ago", ["performance"]),
-        new("snippet", "Debounced async input handler", "toolkit", "Yesterday", ["async"]),
-        new("idea", "Replay viewer for finished matches", "arcade-api", "2 days ago", ["ui"]),
-        new("bug", "Token not refreshed after laptop sleep", "web-client", "3 days ago", ["auth"]),
-        new("log", "Set up Tailwind CSS configuration", "devlogs-web", "4 days ago", ["css", "ui"]),
-        new("fix", "Null reference in user profile loading", "arcade-api", "5 days ago", ["backend"]),
-    ];
+    string activeFilter = "All";
 
     string GetKindClass(string kind) => kind switch
     {
@@ -59,4 +51,8 @@
         "log" => "text-[#5eead4]",
         _ => "text-[#8b9dbf]"
     };
+
+    protected override void OnInitialized() => LogService.OnLogAdded += Refresh;
+    void Refresh() => InvokeAsync(StateHasChanged);
+    public void Dispose() => LogService.OnLogAdded -= Refresh;
 }
