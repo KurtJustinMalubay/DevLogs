@@ -1,0 +1,82 @@
+@inject UiState Ui
+@inject LogService LogService
+@inject NavigationManager Nav
+@implements IDisposable
+
+@if (Ui.Feature == "Search")
+{
+    <div class="fixed inset-0 bg-[#040810]/80 backdrop-blur-sm grid place-items-start pt-[10vh] px-4 z-50 animate-[fade_0.15s_ease-out]" @onclick="Ui.Close">
+        <div class="w-full max-w-[640px] bg-[#131e32] border border-[#243452] rounded-[14px] shadow-[0_24px_60px_rgba(0,0,0,0.6)] overflow-hidden animate-[pop_0.18s_ease-out]" role="dialog" aria-modal="true" @onclick:stopPropagation>
+            <div class="flex items-center px-4 py-3 border-b border-[#243452]">
+                <span class="text-[#8b9dbf] text-lg mr-3">🔍</span>
+                <input @bind="query" @bind:event="oninput" type="text" class="flex-1 bg-transparent border-none text-[#e8eefb] text-[1.1rem] focus:outline-none focus:ring-0" placeholder="Search logs, tags, and snippets..." autofocus />
+                <kbd class="font-mono text-[.75rem] p-[.15rem_.45rem] border border-[#243452] rounded-[5px] text-[#8b9dbf] ml-3 cursor-pointer" @onclick="Ui.Close">ESC</kbd>
+            </div>
+            
+            @if (Results.Any())
+            {
+                <ul class="max-h-[60vh] overflow-y-auto p-2">
+                    @foreach (var e in Results)
+                    {
+                        <li>
+                            <button class="grid grid-cols-[auto_1fr_auto] gap-[0.9rem] items-center w-full text-left p-[0.7rem_0.8rem] rounded-[8px] hover:bg-[#1a2843]" @onclick="() => NavigateToLog(e)">
+                                <b class="font-mono font-semibold text-[0.8rem] @(GetKindClass(e.Kind))">@e.Kind</b>
+                                <span class="grid min-w-0">
+                                    <span class="font-semibold whitespace-nowrap overflow-hidden text-ellipsis text-[#e8eefb]">@e.Title</span>
+                                    <span class="text-[0.82rem] text-[#8b9dbf]">@e.Project · @e.CreatedAt.ToString("MMM dd")</span>
+                                </span>
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrWhiteSpace(query))
+            {
+                <div class="p-8 text-center text-[#8b9dbf]">
+                    <p>No results found for "@query"</p>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    string query = "";
+    
+    IEnumerable<LogEntry> Results => string.IsNullOrWhiteSpace(query) 
+        ? Array.Empty<LogEntry>() 
+        : LogService.GetAllLogs().Where(l => 
+            l.Title.Contains(query, StringComparison.OrdinalIgnoreCase) || 
+            l.Content.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+            l.Tags.Any(t => t.Contains(query, StringComparison.OrdinalIgnoreCase)));
+
+    protected override void OnInitialized() => Ui.Changed += Refresh;
+    
+    void Refresh() 
+    {
+        if (Ui.Feature == "Search" && string.IsNullOrEmpty(query))
+        {
+            query = "";
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() => Ui.Changed -= Refresh;
+
+    void NavigateToLog(LogEntry entry)
+    {
+        Ui.Close();
+        Nav.NavigateTo("/logs");
+    }
+
+    string GetKindClass(string kind) => kind switch
+    {
+        "fix" => "text-[#ff9f7a]",
+        "note" => "text-[#82a8ff]",
+        "snippet" => "text-[#c4a1ff]",
+        "idea" => "text-[#f5cd63]",
+        "bug" => "text-[#ff7a8a]",
+        "log" => "text-[#5eead4]",
+        _ => "text-[#8b9dbf]"
+    };
+}

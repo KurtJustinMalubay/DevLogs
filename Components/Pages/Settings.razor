@@ -1,0 +1,153 @@
+@page "/settings"
+@using System.ComponentModel.DataAnnotations
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<PageTitle>Settings · DevLogs</PageTitle>
+
+<div class="max-w-[600px] mb-8">
+    <h1 class="text-[1.75rem] font-bold leading-[1.2] mb-1.5 tracking-[-0.02em]">Settings</h1>
+    <p class="text-[#8b9dbf] mb-6">Manage your account settings and preferences.</p>
+</div>
+
+<div class="max-w-[600px] grid gap-6">
+    <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.5rem]">
+        <h2 class="text-xl font-semibold mb-4">Profile Information</h2>
+        
+        <EditForm Model="model" OnValidSubmit="SaveProfileAsync" FormName="settings">
+            <DataAnnotationsValidator />
+            
+            @if (message != null)
+            {
+                <div class="mb-4 p-3 rounded-lg @(isError ? "bg-[rgba(255,122,138,0.1)] border border-[rgba(255,122,138,0.4)] text-[#ffc2ca]" : "bg-[rgba(94,234,212,0.1)] border border-[rgba(94,234,212,0.4)] text-[#5eead4]")">
+                    @message
+                </div>
+            }
+
+            <div class="grid gap-4">
+                <label class="grid gap-1 font-semibold text-sm">
+                    <span>Username</span>
+                    <InputText @bind-Value="model.Username" class="w-full p-[0.7rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" />
+                    <ValidationMessage For="() => model.Username" class="text-[#ff7a8a] text-[0.82rem] font-normal" />
+                </label>
+
+                <label class="grid gap-1 font-semibold text-sm">
+                    <span>Email</span>
+                    <InputText @bind-Value="model.Email" class="w-full p-[0.7rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" />
+                    <ValidationMessage For="() => model.Email" class="text-[#ff7a8a] text-[0.82rem] font-normal" />
+                </label>
+
+                <div class="pt-2">
+                    <button class="inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 disabled:opacity-45 disabled:cursor-not-allowed" disabled="@busy">
+                        @(busy ? "Saving..." : "Save changes")
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    </section>
+
+    <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.5rem]">
+        <h2 class="text-xl font-semibold mb-4">Preferences</h2>
+        <div class="grid gap-6">
+            <label class="flex items-center justify-between cursor-pointer">
+                <div>
+                    <div class="font-semibold text-sm text-[#e8eefb]">Email Notifications</div>
+                    <div class="text-sm text-[#8b9dbf]">Receive weekly summaries of your logs.</div>
+                </div>
+                <div class="relative">
+                    <input type="checkbox" @bind="emailNotifications" class="peer sr-only" />
+                    <div class="w-11 h-6 bg-[#243452] rounded-[20px] peer peer-checked:bg-[#5eead4] transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#e8eefb] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:bg-[#04211d]"></div>
+                </div>
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+                <div>
+                    <div class="font-semibold text-sm text-[#e8eefb]">Public Profile</div>
+                    <div class="text-sm text-[#8b9dbf]">Allow others to view your public logs.</div>
+                </div>
+                <div class="relative">
+                    <input type="checkbox" @bind="publicProfile" class="peer sr-only" />
+                    <div class="w-11 h-6 bg-[#243452] rounded-[20px] peer peer-checked:bg-[#5eead4] transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#e8eefb] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:bg-[#04211d]"></div>
+                </div>
+            </label>
+        </div>
+    </section>
+
+    <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.5rem]">
+        <h2 class="text-xl font-semibold mb-4">Appearance</h2>
+        <div class="grid grid-cols-3 gap-3">
+            <button class="p-3 border rounded-[8px] flex flex-col items-center gap-2 transition-colors @(theme == "dark" ? "border-[#5eead4] bg-[#1a2843] text-[#5eead4]" : "border-[#243452] text-[#8b9dbf] hover:border-[#3a5078]")" @onclick='() => theme = "dark"'>
+                <span class="text-2xl">🌙</span>
+                <span class="text-sm font-semibold">Dark</span>
+            </button>
+            <button class="p-3 border rounded-[8px] flex flex-col items-center gap-2 transition-colors border-[#243452] text-[#8b9dbf] opacity-50 cursor-not-allowed" disabled>
+                <span class="text-2xl">☀️</span>
+                <span class="text-sm font-semibold">Light</span>
+            </button>
+            <button class="p-3 border rounded-[8px] flex flex-col items-center gap-2 transition-colors @(theme == "system" ? "border-[#5eead4] bg-[#1a2843] text-[#5eead4]" : "border-[#243452] text-[#8b9dbf] hover:border-[#3a5078]")" @onclick='() => theme = "system"'>
+                <span class="text-2xl">💻</span>
+                <span class="text-sm font-semibold">System</span>
+            </button>
+        </div>
+        <p class="text-[#5d6f92] text-[0.8rem] mt-4">Light mode is currently under development.</p>
+    </section>
+
+    <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.5rem]">
+        <h2 class="text-xl font-semibold mb-4 text-[#ff7a8a]">Danger Zone</h2>
+        <p class="text-[#8b9dbf] text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+        <button class="px-4 py-2 border border-[#ff7a8a] text-[#ff7a8a] font-semibold rounded-[10px] hover:bg-[rgba(255,122,138,0.1)] transition-colors" @onclick="DeleteAccount">
+            Delete Account
+        </button>
+    </section>
+</div>
+
+@code {
+    class ProfileModel
+    {
+        [Required(ErrorMessage = "Username is required.")]
+        [StringLength(24, MinimumLength = 3)]
+        [RegularExpression("^[A-Za-z0-9_-]+$")]
+        public string Username { get; set; } = "";
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+    }
+
+    readonly ProfileModel model = new();
+    bool busy;
+    string? message;
+    bool isError;
+
+    // Mock settings state
+    bool emailNotifications = true;
+    bool publicProfile = false;
+    string theme = "dark";
+
+    protected override void OnInitialized()
+    {
+        if (Auth.Current is not null)
+        {
+            model.Username = Auth.Current.Username;
+            model.Email = Auth.Current.Email;
+        }
+    }
+
+    async Task SaveProfileAsync()
+    {
+        if (busy) return;
+        busy = true;
+        message = null;
+        
+        var (ok, err) = await Auth.UpdateProfileAsync(model.Username.Trim(), model.Email.Trim());
+        
+        busy = false;
+        isError = !ok;
+        message = ok ? "Profile updated successfully." : err;
+    }
+
+    void DeleteAccount()
+    {
+        Auth.SignOut();
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+}

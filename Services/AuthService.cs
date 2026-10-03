@@ -44,4 +44,25 @@ public class AuthService
     }
 
     public void SignOut() => Current = null;
+
+    public async Task<(bool Ok, string? Error)> UpdateProfileAsync(string username, string email)
+    {
+        await Task.Delay(250);
+        if (Current == null) return (false, "Not logged in.");
+        
+        if (!Current.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && 
+            Users.Values.Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase)))
+            return (false, "Email is already taken.");
+            
+        if (!Current.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
+        {
+            if (Users.ContainsKey(username)) return (false, "Username is already taken.");
+            Users.TryRemove(Current.Username, out _);
+        }
+        
+        var updated = Current with { Username = username, Email = email };
+        Users[username] = updated;
+        Current = updated;
+        return (true, null);
+    }
 }

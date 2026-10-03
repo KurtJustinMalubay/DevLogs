@@ -15,6 +15,7 @@
                 {
                     <button class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" @onclick="() => Ui.Show(label)"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">@icon</span>@label</button>
                 }
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/settings"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⚙</span>Settings</NavLink>
             </div>
             <div class="mt-auto grid grid-cols-[auto_1fr] gap-[.1rem_.7rem] items-center pt-[1rem] border-t border-[#243452]">
                 <span class="row-span-2 w-[34px] h-[34px] rounded-full bg-[#1a2843] grid place-items-center font-bold text-[#5eead4]">@(Auth.Current!.Username[..1].ToUpper())</span>
@@ -35,12 +36,13 @@
 }
 <UnderDevModal />
 <NewLogModal />
+<SearchModal />
 
 @code {
     static readonly (string Icon, string Label)[] Items =
     [
         ("{ }", "Snippets"), ("⚑", "Bug tracker"),
-        ("#", "Tags"), ("◷", "Timeline"), ("⚙", "Settings")
+        ("#", "Tags"), ("◷", "Timeline")
     ];
 
     protected override void OnInitialized()
