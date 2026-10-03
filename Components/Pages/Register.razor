@@ -5,60 +5,63 @@
 @inject UiState Ui
 
 <PageTitle>Create account · DevLogs</PageTitle>
-<h1>Create your account</h1>
-<p class="muted">Free while we build. Takes about 20 seconds.</p>
+<h1 class="text-[1.75rem] leading-[1.2] m-0 mb-[.4rem] tracking-[-.02em]">Create your account</h1>
+<p class="m-0 mb-[1rem] text-[#8b9dbf]">Free while we build. Takes about 20 seconds.</p>
 
-<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="register" class="form">
+<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="register" class="grid gap-[1.1rem] mt-[1.6rem]">
     <DataAnnotationsValidator />
-    @if (error is not null) { <div class="alert" role="alert">@error</div> }
+    @if (error is not null) { <div class="bg-[#ff7a8a]/10 border border-[#ff7a8a]/40 text-[#ffc2ca] px-[.9rem] py-[.7rem] rounded-[10px] text-[.9rem]" role="alert">@error</div> }
 
-    <label class="field">
+    <label class="grid gap-[.4rem] font-semibold text-[.9rem]">
         <span>Username</span>
-        <InputText @bind-Value="model.Username" autocomplete="username" placeholder="ada_dev" />
-        <ValidationMessage For="() => model.Username" />
+        <InputText @bind-Value="model.Username" autocomplete="username" placeholder="ada_dev" class="w-full px-[.85rem] py-[.7rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+        <ValidationMessage For="() => model.Username" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </label>
 
-    <label class="field">
+    <label class="grid gap-[.4rem] font-semibold text-[.9rem]">
         <span>Email</span>
-        <InputText @bind-Value="model.Email" type="email" autocomplete="email" placeholder="you@devlogs.dev" />
-        <ValidationMessage For="() => model.Email" />
+        <InputText @bind-Value="model.Email" type="email" autocomplete="email" placeholder="you@devlogs.dev" class="w-full px-[.85rem] py-[.7rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+        <ValidationMessage For="() => model.Email" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </label>
 
-    <div class="field">
+    <div class="grid gap-[.4rem] font-semibold text-[.9rem]">
         <label for="register-password">Password</label>
-        <span class="pw">
+        <span class="relative block">
             <InputText id="register-password" @bind-Value="model.Password"
-                       type="@(showPw ? "text" : "password")" autocomplete="new-password" />
-            <button type="button" class="link" aria-controls="register-password" aria-pressed="@(showPw ? "true" : "false")"
+                       type="@(showPw ? "text" : "password")" autocomplete="new-password" class="w-full px-[.85rem] py-[.7rem] pr-[4.2rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+            <button type="button" class="text-[#5eead4] text-[.875rem] hover:underline absolute right-[.8rem] top-1/2 -translate-y-1/2" aria-controls="register-password" aria-pressed="@(showPw ? "true" : "false")"
                     aria-label="@(showPw ? "Hide password" : "Show password")" @onclick="() => showPw = !showPw">
                 @(showPw ? "Hide" : "Show")
             </button>
         </span>
-        <span class="meter" aria-hidden="true">
-            @for (var i = 1; i <= 4; i++) { <i class="@(i <= Strength ? "on s" + Strength : "")"></i> }
+        <span class="grid grid-cols-4 gap-[4px]" aria-hidden="true">
+            @for (var i = 1; i <= 4; i++) {
+                var bg = i <= Strength ? Strength switch { 1 => "bg-[#ff7a8a]", 2 => "bg-[#ff9f7a]", 3 => "bg-[#f5cd63]", 4 => "bg-[#5eead4]", _ => "bg-[#243452]" } : "bg-[#243452]";
+                <i class="h-[4px] rounded-[2px] @bg"></i> 
+            }
         </span>
-        <ValidationMessage For="() => model.Password" />
+        <ValidationMessage For="() => model.Password" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </div>
 
-    <div class="field">
+    <div class="grid gap-[.4rem] font-semibold text-[.9rem]">
         <label for="register-confirm-password">Confirm password</label>
-        <span class="pw">
-            <InputText id="register-confirm-password" @bind-Value="model.Confirm" type="@(showConfirmPw ? "text" : "password")" autocomplete="new-password" />
-            <button type="button" class="link" aria-controls="register-confirm-password" aria-pressed="@(showConfirmPw ? "true" : "false")"
+        <span class="relative block">
+            <InputText id="register-confirm-password" @bind-Value="model.Confirm" type="@(showConfirmPw ? "text" : "password")" autocomplete="new-password" class="w-full px-[.85rem] py-[.7rem] pr-[4.2rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+            <button type="button" class="text-[#5eead4] text-[.875rem] hover:underline absolute right-[.8rem] top-1/2 -translate-y-1/2" aria-controls="register-confirm-password" aria-pressed="@(showConfirmPw ? "true" : "false")"
                     aria-label="@(showConfirmPw ? "Hide confirmation password" : "Show confirmation password")"
                     @onclick="() => showConfirmPw = !showConfirmPw">
                 @(showConfirmPw ? "Hide" : "Show")
             </button>
         </span>
-        <ValidationMessage For="() => model.Confirm" />
+        <ValidationMessage For="() => model.Confirm" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </div>
 
-    <button class="btn primary block" disabled="@busy">@(busy ? "Creating account…" : "Create account")</button>
-    <div class="divider"><span>or</span></div>
-    <button type="button" class="btn ghost block" @onclick='() => Ui.Show("GitHub sign-up")'>Sign up with GitHub</button>
+    <button class="inline-flex items-center justify-center gap-[.4rem] px-[1.05rem] py-[.6rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:brightness-[1.08] hover:no-underline disabled:opacity-45 disabled:cursor-not-allowed w-full" disabled="@busy">@(busy ? "Creating account…" : "Create account")</button>
+    <div class="flex items-center gap-[.8rem] text-[#8b9dbf] text-[.85rem] before:flex-1 before:h-[1px] before:bg-[#243452] after:flex-1 after:h-[1px] after:bg-[#243452]"><span>or</span></div>
+    <button type="button" class="inline-flex items-center justify-center gap-[.4rem] px-[1.05rem] py-[.6rem] rounded-[10px] font-semibold border border-[#243452] bg-transparent transition-[filter,background] duration-150 hover:bg-[#1a2843] w-full" @onclick='() => Ui.Show("GitHub sign-up")'>Sign up with GitHub</button>
 </EditForm>
 
-<p class="switch">Already have an account? <a href="/login">Sign in</a></p>
+<p class="text-center m-0 mt-[1.5rem] text-[#8b9dbf]">Already have an account? <a href="/login" class="text-[#5eead4] no-underline hover:underline">Sign in</a></p>
 
 @code {
     class RegisterModel

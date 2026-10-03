@@ -5,40 +5,40 @@
 @inject UiState Ui
 
 <PageTitle>Sign in · DevLogs</PageTitle>
-<h1>Welcome back</h1>
-<p class="muted">Sign in to pick up your logs where you left off.</p>
+<h1 class="text-[1.75rem] leading-[1.2] m-0 mb-[.4rem] tracking-[-.02em]">Welcome back</h1>
+<p class="m-0 mb-[1rem] text-[#8b9dbf]">Sign in to pick up your logs where you left off.</p>
 
-<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="login" class="form">
+<EditForm Model="model" OnValidSubmit="SubmitAsync" FormName="login" class="grid gap-[1.1rem] mt-[1.6rem]">
     <DataAnnotationsValidator />
-    @if (error is not null) { <div class="alert" role="alert">@error</div> }
+    @if (error is not null) { <div class="bg-[#ff7a8a]/10 border border-[#ff7a8a]/40 text-[#ffc2ca] px-[.9rem] py-[.7rem] rounded-[10px] text-[.9rem]" role="alert">@error</div> }
 
-    <label class="field">
+    <label class="grid gap-[.4rem] font-semibold text-[.9rem]">
         <span>Username or email</span>
-        <InputText @bind-Value="model.Id" autocomplete="username" placeholder="you@devlogs.dev" />
-        <ValidationMessage For="() => model.Id" />
+        <InputText @bind-Value="model.Id" autocomplete="username" placeholder="you@devlogs.dev" class="w-full px-[.85rem] py-[.7rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+        <ValidationMessage For="() => model.Id" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </label>
 
-    <div class="field">
-        <div class="field-row">
+    <div class="grid gap-[.4rem] font-semibold text-[.9rem]">
+        <div class="flex justify-between items-baseline">
             <label for="login-password">Password</label>
-            <button type="button" class="link" @onclick='() => Ui.Show("Password reset")'>Forgot password?</button>
+            <button type="button" class="text-[#5eead4] text-[.875rem] hover:underline" @onclick='() => Ui.Show("Password reset")'>Forgot password?</button>
         </div>
-        <span class="pw">
-            <InputText id="login-password" @bind-Value="model.Password" type="@(showPw ? "text" : "password")" autocomplete="current-password" />
-            <button type="button" class="link" aria-controls="login-password" aria-pressed="@(showPw ? "true" : "false")"
+        <span class="relative block">
+            <InputText id="login-password" @bind-Value="model.Password" type="@(showPw ? "text" : "password")" autocomplete="current-password" class="w-full px-[.85rem] py-[.7rem] pr-[4.2rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#e8eefb] font-normal placeholder-[#566888] focus:outline-none focus:border-[#5eead4] focus:shadow-[0_0_0_3px_rgba(94,234,212,.18)]" />
+            <button type="button" class="text-[#5eead4] text-[.875rem] hover:underline absolute right-[.8rem] top-1/2 -translate-y-1/2" aria-controls="login-password" aria-pressed="@(showPw ? "true" : "false")"
                     aria-label="@(showPw ? "Hide password" : "Show password")" @onclick="() => showPw = !showPw">
                 @(showPw ? "Hide" : "Show")
             </button>
         </span>
-        <ValidationMessage For="() => model.Password" />
+        <ValidationMessage For="() => model.Password" class="text-[#ff7a8a] font-normal text-[.82rem]" />
     </div>
 
-    <button class="btn primary block" disabled="@busy">@(busy ? "Signing in…" : "Sign in")</button>
-    <div class="divider"><span>or</span></div>
-    <button type="button" class="btn ghost block" @onclick='() => Ui.Show("GitHub sign-in")'>Continue with GitHub</button>
+    <button class="inline-flex items-center justify-center gap-[.4rem] px-[1.05rem] py-[.6rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:brightness-[1.08] hover:no-underline disabled:opacity-45 disabled:cursor-not-allowed w-full" disabled="@busy">@(busy ? "Signing in…" : "Sign in")</button>
+    <div class="flex items-center gap-[.8rem] text-[#8b9dbf] text-[.85rem] before:flex-1 before:h-[1px] before:bg-[#243452] after:flex-1 after:h-[1px] after:bg-[#243452]"><span>or</span></div>
+    <button type="button" class="inline-flex items-center justify-center gap-[.4rem] px-[1.05rem] py-[.6rem] rounded-[10px] font-semibold border border-[#243452] bg-transparent transition-[filter,background] duration-150 hover:bg-[#1a2843] w-full" @onclick='() => Ui.Show("GitHub sign-in")'>Continue with GitHub</button>
 </EditForm>
 
-<p class="switch">New to DevLogs? <a href="/register">Create an account</a></p>
+<p class="text-center m-0 mt-[1.5rem] text-[#8b9dbf]">New to DevLogs? <a href="/register" class="text-[#5eead4] no-underline hover:underline">Create an account</a></p>
 
 @code {
     class LoginModel

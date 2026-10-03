@@ -1,21 +1,21 @@
 @inherits LayoutComponentBase
 
-<div class="auth">
-    <aside class="auth-brand">
-        <a class="brand" href="/"><span class="mark"></span>DevLogs</a>
+<div class="grid grid-cols-[1.05fr_1fr] min-h-screen">
+    <aside class="bg-[#0a111d] border-r border-[#243452] p-[2.5rem_3rem] flex flex-col justify-between gap-[2rem]">
+        <a class="flex items-center gap-[.6rem] font-bold text-[1.15rem] text-[#e8eefb] tracking-[-.02em] hover:no-underline" href="/"><span class="w-[10px] h-[22px] bg-[#5eead4] rounded-[3px] shadow-[14px_0_0_-3px_#5eead4] mr-[.6rem]"></span>DevLogs</a>
         <div>
-            <h2 class="auth-tagline">Write it down while it's fresh.</h2>
-            <p class="muted">One calm place for your dev notes, fixes, snippets and ideas.</p>
+            <h2 class="text-[2.4rem] leading-[1.1] tracking-[-.03em] mb-[.8rem] max-w-[14ch] m-0">Write it down while it's fresh.</h2>
+            <p class="text-[#8b9dbf]">One calm place for your dev notes, fixes, snippets and ideas.</p>
         </div>
-        <div class="stream" aria-hidden="true">
-            <p><time>09:12</time><b class="k-fix">fix</b>Race in matchmaking queue</p>
-            <p><time>10:40</time><b class="k-snippet">snippet</b>Debounced async handler</p>
-            <p><time>13:05</time><b class="k-idea">idea</b>Replay viewer for matches</p>
-            <p><time>16:21</time><b class="k-note">note</b>Why chunk loading stutters</p>
+        <div class="font-mono text-[.85rem] leading-none border-l-[2px] border-[#243452] pl-[1.1rem] grid gap-[1.1rem]" aria-hidden="true">
+            <p class="m-0 flex gap-[.8rem] items-baseline text-[#8b9dbf]"><time class="text-[#5d6f92]">09:12</time><b class="font-semibold min-w-[4.5rem] text-[#ff9f7a]">fix</b>Race in matchmaking queue</p>
+            <p class="m-0 flex gap-[.8rem] items-baseline text-[#8b9dbf]"><time class="text-[#5d6f92]">10:40</time><b class="font-semibold min-w-[4.5rem] text-[#c4a1ff]">snippet</b>Debounced async handler</p>
+            <p class="m-0 flex gap-[.8rem] items-baseline text-[#8b9dbf]"><time class="text-[#5d6f92]">13:05</time><b class="font-semibold min-w-[4.5rem] text-[#f5cd63]">idea</b>Replay viewer for matches</p>
+            <p class="m-0 flex gap-[.8rem] items-baseline text-[#8b9dbf]"><time class="text-[#5d6f92]">16:21</time><b class="font-semibold min-w-[4.5rem] text-[#82a8ff]">note</b>Why chunk loading stutters</p>
         </div>
     </aside>
-    <main class="auth-panel">
-        <div class="auth-card">@Body</div>
+    <main class="grid place-items-center p-[2rem]">
+        <div class="w-full max-w-[400px]">@Body</div>
     </main>
 </div>
 <UnderDevModal />

@@ -6,8 +6,7 @@ namespace DevLogs.Services;
 public record UserAccount(string Username, string Email, byte[] Salt, byte[] Hash);
 
 /// <summary>
-/// In-memory accounts with PBKDF2-hashed passwords. Swap the static dictionary
-/// for a real database when persistence is needed.
+/// In-memory accounts with PBKDF2-hashed passwords.
 /// </summary>
 public class AuthService
 {

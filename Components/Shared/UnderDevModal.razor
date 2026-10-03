@@ -3,12 +3,12 @@
 
 @if (Ui.Feature is not null)
 {
-    <div class="scrim" @onclick="Ui.Close">
-        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dev-title" @onclick:stopPropagation>
-            <div class="dialog-icon" aria-hidden="true">🚧</div>
-            <h2 id="dev-title">@Ui.Feature is under development</h2>
-            <p class="muted">We're still building this part of DevLogs. It will appear here soon.</p>
-            <button class="btn primary" @onclick="Ui.Close">Got it</button>
+    <div class="fixed inset-0 bg-[rgba(4,8,16,.7)] grid place-items-center p-[1rem] z-50 animate-[fade_.15s_ease-out]" @onclick="Ui.Close">
+        <div class="w-full max-w-[380px] bg-[#131e32] border border-[#243452] rounded-[14px] p-[2rem_1.8rem] text-center shadow-[0_24px_60px_rgba(0,0,0,.5)] animate-[pop_.18s_ease-out]" role="dialog" aria-modal="true" aria-labelledby="dev-title" @onclick:stopPropagation>
+            <div class="text-[2.2rem] mb-[.6rem]" aria-hidden="true">🚧</div>
+            <h2 class="text-[1.2rem] mb-[.5rem]" id="dev-title">@Ui.Feature is under development</h2>
+            <p class="text-[#8b9dbf]">We're still building this part of DevLogs. It will appear here soon.</p>
+            <button class="inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 hover:not(:disabled):no-underline disabled:opacity-45 disabled:cursor-not-allowed mt-[.6rem] min-w-[8rem]" @onclick="Ui.Close">Got it</button>
         </div>
     </div>
 }

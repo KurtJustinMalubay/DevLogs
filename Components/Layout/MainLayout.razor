@@ -5,30 +5,30 @@
 
 @if (Auth.IsAuthenticated)
 {
-    <div class="shell">
-        <nav class="side" aria-label="Main">
-            <a class="brand" href="/"><span class="mark"></span>DevLogs</a>
-            <div class="nav-list">
-                <NavLink class="nav-item" href="/" Match="NavLinkMatch.All"><span class="ico">⌂</span>Home</NavLink>
+    <div class="grid grid-cols-[230px_1fr] min-h-screen">
+        <nav class="bg-[#0a111d] border-r border-[#243452] p-[1.4rem_1rem] flex flex-col gap-[1.6rem] sticky top-0 h-screen" aria-label="Main">
+            <a class="flex items-center gap-[.6rem] font-bold text-[1.15rem] text-[#e8eefb] tracking-[-.02em] hover:no-underline" href="/"><span class="w-[10px] h-[22px] bg-[#5eead4] rounded-[3px] shadow-[14px_0_0_-3px_#5eead4] mr-[.6rem]"></span>DevLogs</a>
+            <div class="grid gap-[2px]">
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/" Match="NavLinkMatch.All"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⌂</span>Home</NavLink>
                 @foreach (var (icon, label) in Items)
                 {
-                    <button class="nav-item" @onclick="() => Ui.Show(label)"><span class="ico">@icon</span>@label</button>
+                    <button class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" @onclick="() => Ui.Show(label)"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">@icon</span>@label</button>
                 }
             </div>
-            <div class="side-foot">
-                <span class="avatar">@(Auth.Current!.Username[..1].ToUpper())</span>
-                <span class="who">@Auth.Current.Username</span>
-                <button class="link" @onclick="SignOut">Sign out</button>
+            <div class="mt-auto grid grid-cols-[auto_1fr] gap-[.1rem_.7rem] items-center pt-[1rem] border-t border-[#243452]">
+                <span class="row-span-2 w-[34px] h-[34px] rounded-full bg-[#1a2843] grid place-items-center font-bold text-[#5eead4]">@(Auth.Current!.Username[..1].ToUpper())</span>
+                <span class="font-semibold overflow-hidden text-ellipsis">@Auth.Current.Username</span>
+                <button class="text-left text-[#8b9dbf] p-0 text-[.875rem] hover:underline" @onclick="SignOut">Sign out</button>
             </div>
         </nav>
-        <div class="main">
-            <header class="top">
-                <button class="search" @onclick='() => Ui.Show("Search")'>
-                    <span>Search logs, snippets, tags</span><kbd>Ctrl K</kbd>
+        <div class="min-w-0">
+            <header class="flex gap-[1rem] items-center p-[1rem_2rem] border-b border-[#243452] sticky top-0 bg-[rgba(13,21,36,.92)] backdrop-blur-[8px] z-[5]">
+                <button class="flex-1 max-w-[520px] flex justify-between items-center p-[.6rem_.9rem] bg-[#131e32] border border-[#243452] rounded-[10px] text-[#6f81a4] text-left hover:border-[#34496f]" @onclick='() => Ui.Show("Search")'>
+                    <span>Search logs, snippets, tags</span><kbd class="font-mono text-[.75rem] p-[.15rem_.45rem] border border-[#243452] rounded-[5px] text-[#8b9dbf]">Ctrl K</kbd>
                 </button>
-                <button class="btn primary" @onclick='() => Ui.Show("New log")'>+ New log</button>
+                <button class="ml-auto inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:!no-underline enabled:hover:brightness-[1.08] disabled:opacity-[.45] disabled:cursor-not-allowed" @onclick='() => Ui.Show("New log")'>+ New log</button>
             </header>
-            <div class="content">@Body</div>
+            <div class="p-[2rem] max-w-[1180px]">@Body</div>
         </div>
     </div>
 }

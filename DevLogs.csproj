@@ -4,4 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <Target Name="Tailwind" BeforeTargets="Build">
+    <Exec Command="tailwindcss.exe -i input.css -o wwwroot/css/app.css" />
+  </Target>
 </Project>

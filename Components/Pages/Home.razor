@@ -4,75 +4,75 @@
 
 <PageTitle>Home · DevLogs</PageTitle>
 
-<section class="hello">
+<section class="mb-[1.6rem]">
     <h1>@Greeting, @Auth.Current?.Username</h1>
-    <p class="muted">Here's your workspace. Capture something, or pick up a recent log.</p>
+    <p class="text-[#8b9dbf]">Here's your workspace. Capture something, or pick up a recent log.</p>
 </section>
 
-<section class="stats" aria-label="This week at a glance">
-    <div><strong>12</strong><span>logs this week</span></div>
-    <div><strong>48</strong><span>snippets saved</span></div>
-    <div><strong>3</strong><span>open bugs</span></div>
-    <div><strong>5 days</strong><span>logging streak</span></div>
+<section class="grid grid-cols-4 border border-[#243452] rounded-[10px] bg-[#131e32] mb-[1.6rem]" aria-label="This week at a glance">
+    <div class="p-[1rem_1.3rem] grid gap-[.1rem]"><strong class="text-[1.5rem] tracking-[-.02em]">12</strong><span class="text-[#8b9dbf] text-[.85rem]">logs this week</span></div>
+    <div class="p-[1rem_1.3rem] grid gap-[.1rem] border-l border-[#243452]"><strong class="text-[1.5rem] tracking-[-.02em]">48</strong><span class="text-[#8b9dbf] text-[.85rem]">snippets saved</span></div>
+    <div class="p-[1rem_1.3rem] grid gap-[.1rem] border-l border-[#243452]"><strong class="text-[1.5rem] tracking-[-.02em]">3</strong><span class="text-[#8b9dbf] text-[.85rem]">open bugs</span></div>
+    <div class="p-[1rem_1.3rem] grid gap-[.1rem] border-l border-[#243452]"><strong class="text-[1.5rem] tracking-[-.02em]">5 days</strong><span class="text-[#8b9dbf] text-[.85rem]">logging streak</span></div>
 </section>
 
-<div class="grid">
-    <div class="col">
-        <section class="panel">
+<div class="grid grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-[1.4rem] items-start">
+    <div class="grid gap-[1.4rem]">
+        <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
             <h2>Quick capture</h2>
-            <div class="chips" role="group" aria-label="Entry type">
+            <div class="flex flex-wrap gap-[.5rem] mb-[.9rem]" role="group" aria-label="Entry type">
                 @foreach (var k in Kinds)
                 {
-                    <button class="chip @(kind == k ? "on" : "")" aria-pressed="@(kind == k ? "true" : "false")" @onclick="() => kind = k">@k</button>
+                    <button class="p-[.3rem_.8rem] border border-[#243452] rounded-[999px] text-[.85rem] hover:text-[#e8eefb] hover:border-[#3a5078] @(kind == k ? "bg-[#5eead4] border-[#5eead4] text-[#04211d] font-semibold" : "text-[#8b9dbf]")" aria-pressed="@(kind == k ? "true" : "false")" @onclick="() => kind = k">@k</button>
                 }
             </div>
-            <textarea class="capture" rows="3" @bind="draft" @bind:event="oninput"
+            <textarea class="w-full resize-y min-h-[88px] p-[.8rem_.9rem] bg-[#0d1524] border border-[#243452] rounded-[10px] text-[#e8eefb] font-inherit focus:outline-none focus:border-[#5eead4]" rows="3" @bind="draft" @bind:event="oninput"
                       placeholder="What did you just figure out, fix, or break?"></textarea>
-            <div class="capture-foot">
-                <span class="muted">Markdown supported soon</span>
-                <button class="btn primary" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick='() => Ui.Show("Saving logs")'>Save @kind.ToLower()</button>
+            <div class="flex justify-between items-center mt-[.8rem] text-[.85rem]">
+                <span class="text-[#8b9dbf]">Markdown supported soon</span>
+                <button class="inline-flex items-center justify-center gap-[.4rem] p-[.6rem_1.05rem] rounded-[10px] font-semibold border border-transparent transition-[filter,background] duration-150 bg-[#5eead4] text-[#04211d] hover:not(:disabled):brightness-108 hover:not(:disabled):no-underline disabled:opacity-45 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(draft))" @onclick='() => Ui.Show("Saving logs")'>Save @kind.ToLower()</button>
             </div>
         </section>
 
-        <section class="panel">
-            <div class="panel-head">
+        <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
+            <div class="flex justify-between items-baseline">
                 <h2>Recent logs</h2>
-                <button class="link" @onclick='() => Ui.Show("Logs")'>View all</button>
+                <button class="text-[#5eead4] text-[.875rem] hover:underline" @onclick='() => Ui.Show("Logs")'>View all</button>
             </div>
-            <ul class="entries">
+            <ul class="grid gap-[2px] m-[0_-.5rem]">
                 @foreach (var e in Recent)
                 {
                     <li>
-                        <button class="entry" @onclick='() => Ui.Show("Log viewer")'>
-                            <b class="kind k-@e.Kind">@e.Kind</b>
-                            <span class="entry-main">
-                                <span class="entry-title">@e.Title</span>
-                                <span class="muted">@e.Project · @e.When</span>
+                        <button class="grid grid-cols-[4.2rem_1fr_auto] gap-[.9rem] items-center w-full text-left p-[.7rem_.5rem] rounded-[8px] hover:bg-[#1a2843]" @onclick='() => Ui.Show("Log viewer")'>
+                            <b class="font-semibold text-[.8rem] font-[var(--mono)] @(e.Kind switch { "log" => "text-[#5eead4]", "fix" => "text-[#ff9f7a]", "note" => "text-[#82a8ff]", "snippet" => "text-[#c4a1ff]", "idea" => "text-[#f5cd63]", "bug" => "text-[#ff7a8a]", _ => "" })">@e.Kind</b>
+                            <span class="grid min-w-0">
+                                <span class="font-semibold whitespace-nowrap overflow-hidden text-ellipsis">@e.Title</span>
+                                <span class="text-[#8b9dbf] text-[.82rem]">@e.Project · @e.When</span>
                             </span>
-                            <span class="tags">@foreach (var t in e.Tags) { <em>#@t</em> }</span>
+                            <span class="flex gap-[.5rem] text-[#8b9dbf] text-[.78rem] font-[var(--mono)]">@foreach (var t in e.Tags) { <em class="not-italic">#@t</em> }</span>
                         </button>
                     </li>
                 }
             </ul>
-            <p class="sample">Sample data for preview</p>
+            <p class="text-[#5d6f92] text-[.78rem] m-[.9rem_0_0]">Sample data for preview</p>
         </section>
     </div>
 
-    <div class="col">
-        <section class="panel">
+    <div class="grid gap-[1.4rem]">
+        <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
             <h2>Your last 18 weeks</h2>
-            <div class="heat" role="img" aria-label="Activity heatmap">
-                @foreach (var level in Cells) { <i class="c@(level)"></i> }
+            <div class="grid grid-rows-7 grid-flow-col gap-[4px]" role="img" aria-label="Activity heatmap">
+                @foreach (var level in Cells) { <i class="aspect-square rounded-[3px] block @(level switch { 0 => "bg-[#182640]", 1 => "bg-[#155e57]", 2 => "bg-[#1f9a8c]", 3 => "bg-[#3cc9b6]", 4 => "bg-[#7df5e1]", _ => "" })"></i> }
             </div>
-            <div class="legend"><span>Less</span><i class="c0"></i><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i><span>More</span></div>
+            <div class="flex gap-[4px] items-center justify-end mt-[.8rem] text-[#8b9dbf] text-[.75rem]"><span>Less</span><i class="w-[12px] aspect-square rounded-[3px] block bg-[#182640]"></i><i class="w-[12px] aspect-square rounded-[3px] block bg-[#155e57]"></i><i class="w-[12px] aspect-square rounded-[3px] block bg-[#1f9a8c]"></i><i class="w-[12px] aspect-square rounded-[3px] block bg-[#3cc9b6]"></i><i class="w-[12px] aspect-square rounded-[3px] block bg-[#7df5e1]"></i><span>More</span></div>
         </section>
 
-        <section class="panel">
+        <section class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.2rem_1.3rem]">
             <h2>Jump to</h2>
-            <div class="chips">
+            <div class="flex flex-wrap gap-[.5rem] mb-[.9rem]">
                 @foreach (var t in Tags)
                 {
-                    <button class="chip" @onclick="() => Ui.Show(t)">#@t</button>
+                    <button class="p-[.3rem_.8rem] border border-[#243452] rounded-[999px] text-[#8b9dbf] text-[.85rem] hover:text-[#e8eefb] hover:border-[#3a5078]" @onclick="() => Ui.Show(t)">#@t</button>
                 }
             </div>
         </section>

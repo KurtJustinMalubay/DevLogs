@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0d1524;
+  --color-side: #0a111d;
+  --color-panel: #131e32;
+  --color-raise: #1a2843;
+  --color-line: #243452;
+  --color-text: #e8eefb;
+  --color-muted: #8b9dbf;
+  --color-accent: #5eead4;
+  --color-accent-ink: #04211d;
+  --color-danger: #ff7a8a;
+  --color-k-log: #5eead4;
+  --color-k-fix: #ff9f7a;
+  --color-k-note: #82a8ff;
+  --color-k-snippet: #c4a1ff;
+  --color-k-idea: #f5cd63;
+  --color-k-bug: #ff7a8a;
+  
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+}
+
+@layer base {
+  body {
+    font-size: 15px;
+    line-height: 1.55;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1rem;
+    margin: 0 0 0.9rem;
+    letter-spacing: -0.005em;
+  }
+
+  p {
+    margin: 0 0 1rem;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
