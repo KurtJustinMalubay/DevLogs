@@ -1,0 +1,101 @@
+@page "/snippets"
+@inject LogService LogService
+@implements IDisposable
+
+<PageTitle>Snippets · DevLogs</PageTitle>
+
+<div class="mb-[1.6rem] flex items-end justify-between">
+    <div>
+        <h1 class="text-[1.75rem] font-bold leading-[1.2] mb-1 tracking-[-0.02em]">Snippets</h1>
+        <p class="text-[#8b9dbf]">Your reusable code fragments, saved for later.</p>
+    </div>
+    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] font-semibold bg-[#5eead4] text-[#04211d] hover:brightness-105" @onclick="() => showForm = !showForm">
+        @(showForm ? "Cancel" : "+ Add snippet")
+    </button>
+</div>
+
+@if (showForm)
+{
+    <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.4rem] mb-6 grid gap-4">
+        <h2 class="font-semibold text-[1.05rem] m-0">New Snippet</h2>
+        <label class="grid gap-1 text-sm font-semibold">
+            Title
+            <input @bind="newTitle" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="e.g. Debounced async handler" />
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+            <label class="grid gap-1 text-sm font-semibold">
+                Language
+                <select @bind="newLang" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]">
+                    @foreach (var l in Languages) { <option>@l</option> }
+                </select>
+            </label>
+            <label class="grid gap-1 text-sm font-semibold">
+                Tags <span class="font-normal text-[#8b9dbf]">(space-separated)</span>
+                <input @bind="newTagsRaw" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="async ui auth" />
+            </label>
+        </div>
+        <label class="grid gap-1 text-sm font-semibold">
+            Code
+            <textarea @bind="newCode" rows="6" class="font-mono resize-y p-[0.8rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] text-[0.88rem] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="Paste your snippet here..."></textarea>
+        </label>
+        <div>
+            <button class="px-4 py-2 rounded-[10px] font-semibold bg-[#5eead4] text-[#04211d] hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(newTitle) || string.IsNullOrWhiteSpace(newCode))" @onclick="SaveSnippet">Save snippet</button>
+        </div>
+    </div>
+}
+
+@if (!snippets.Any())
+{
+    <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-12 text-center text-[#8b9dbf]">
+        <p class="text-3xl mb-3">{ }</p>
+        <p class="font-semibold">No snippets yet.</p>
+        <p class="text-sm mt-1">Click "+ Add snippet" to save your first one.</p>
+    </div>
+}
+else
+{
+    <div class="grid gap-4">
+        @foreach (var s in snippets)
+        {
+            <div class="bg-[#131e32] border border-[#243452] rounded-[10px] overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-[#243452]">
+                    <div>
+                        <span class="font-semibold text-[#e8eefb]">@s.Title</span>
+                        <span class="ml-3 px-2 py-0.5 rounded text-[0.75rem] bg-[#1a2843] text-[#82a8ff] font-mono">@s.Language</span>
+                    </div>
+                    <span class="text-[#8b9dbf] text-[0.8rem]">@s.CreatedAt.ToString("MMM dd")</span>
+                </div>
+                <pre class="text-[0.85rem] text-[#c4a1ff] font-mono p-4 overflow-x-auto bg-[#0d1524] m-0 whitespace-pre-wrap">@s.Code</pre>
+                @if (s.Tags.Length > 0)
+                {
+                    <div class="flex gap-2 px-4 py-2 border-t border-[#243452]">
+                        @foreach (var t in s.Tags) { <span class="text-[0.78rem] text-[#8b9dbf] font-mono">#@t</span> }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    static readonly string[] Languages = ["JavaScript", "TypeScript", "C#", "Python", "Rust", "Go", "CSS", "SQL", "Bash", "Other"];
+
+    IEnumerable<SnippetEntry> snippets => LogService.GetAllSnippets();
+
+    bool showForm;
+    string newTitle = "";
+    string newCode = "";
+    string newLang = "JavaScript";
+    string newTagsRaw = "";
+
+    void SaveSnippet()
+    {
+        var tags = newTagsRaw.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        LogService.AddSnippet(newTitle.Trim(), newCode.Trim(), newLang, tags);
+        newTitle = ""; newCode = ""; newTagsRaw = ""; showForm = false;
+    }
+
+    protected override void OnInitialized() => LogService.OnSnippetChanged += Refresh;
+    void Refresh() => InvokeAsync(StateHasChanged);
+    public void Dispose() => LogService.OnSnippetChanged -= Refresh;
+}

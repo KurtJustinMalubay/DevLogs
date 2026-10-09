@@ -1,0 +1,136 @@
+@page "/bugs"
+@inject LogService LogService
+@implements IDisposable
+
+<PageTitle>Bug Tracker · DevLogs</PageTitle>
+
+<div class="mb-[1.6rem] flex items-end justify-between">
+    <div>
+        <h1 class="text-[1.75rem] font-bold leading-[1.2] mb-1 tracking-[-0.02em]">Bug Tracker</h1>
+        <p class="text-[#8b9dbf]">Track and manage issues across your projects.</p>
+    </div>
+    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] font-semibold bg-[#5eead4] text-[#04211d] hover:brightness-105" @onclick="() => showForm = !showForm">
+        @(showForm ? "Cancel" : "+ Report bug")
+    </button>
+</div>
+
+@if (showForm)
+{
+    <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-[1.4rem] mb-6 grid gap-4">
+        <h2 class="font-semibold text-[1.05rem] m-0">New Bug Report</h2>
+        <label class="grid gap-1 text-sm font-semibold">
+            Title
+            <input @bind="newTitle" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="Short, descriptive title" />
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+            <label class="grid gap-1 text-sm font-semibold">
+                Project
+                <input @bind="newProject" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="e.g. arcade-api" />
+            </label>
+            <label class="grid gap-1 text-sm font-semibold">
+                Severity
+                <select @bind="newSeverity" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option selected>High</option>
+                    <option>Critical</option>
+                </select>
+            </label>
+        </div>
+        <label class="grid gap-1 text-sm font-semibold">
+            Tags <span class="font-normal text-[#8b9dbf]">(space-separated)</span>
+            <input @bind="newTagsRaw" class="p-[0.65rem_0.85rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="auth ui netcode" />
+        </label>
+        <label class="grid gap-1 text-sm font-semibold">
+            Description
+            <textarea @bind="newDesc" rows="4" class="resize-y p-[0.8rem] bg-[#0d1524] border border-[#243452] rounded-[8px] text-[#e8eefb] font-normal focus:outline-none focus:border-[#5eead4]" placeholder="Steps to reproduce, expected vs actual behaviour..."></textarea>
+        </label>
+        <div>
+            <button class="px-4 py-2 rounded-[10px] font-semibold bg-[#5eead4] text-[#04211d] hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed" disabled="@(string.IsNullOrWhiteSpace(newTitle))" @onclick="SaveBug">Report bug</button>
+        </div>
+    </div>
+}
+
+<div class="flex flex-wrap gap-2 mb-5">
+    @foreach (var f in new[] { "All", "Open", "In Progress", "Closed" })
+    {
+        <button class="px-3 py-1 text-[0.85rem] border rounded-full transition-colors @(statusFilter == f ? "border-[#5eead4] bg-[#5eead4] text-[#04211d] font-semibold" : "border-[#243452] text-[#8b9dbf] hover:border-[#3a5078] hover:text-[#e8eefb]")" @onclick="() => statusFilter = f">@f</button>
+    }
+</div>
+
+@{
+    var filtered = LogService.GetAllBugs().Where(b => statusFilter == "All" || b.Status == statusFilter).ToList();
+}
+
+@if (!filtered.Any())
+{
+    <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-12 text-center text-[#8b9dbf]">
+        <p class="text-3xl mb-3">⚑</p>
+        <p class="font-semibold">No bugs found.</p>
+        <p class="text-sm mt-1">@(statusFilter == "All" ? "Click \"+ Report bug\" to log your first one." : $"No bugs with status \"{statusFilter}\".")</p>
+    </div>
+}
+else
+{
+    <div class="grid gap-3">
+        @foreach (var b in filtered)
+        {
+            <div class="bg-[#131e32] border border-[#243452] rounded-[10px] p-4 grid gap-2">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="grid gap-1 min-w-0">
+                        <span class="font-semibold text-[#e8eefb] leading-snug">@b.Title</span>
+                        <span class="text-[0.8rem] text-[#8b9dbf]">@b.Project · @b.CreatedAt.ToString("MMM dd")</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[0.75rem] font-semibold px-2 py-0.5 rounded @SeverityClass(b.Severity)">@b.Severity</span>
+                        <select class="text-[0.8rem] bg-[#1a2843] border border-[#243452] rounded-[6px] px-2 py-1 text-[#e8eefb] focus:outline-none focus:border-[#5eead4]"
+                                value="@b.Status" @onchange="e => LogService.UpdateBugStatus(b.Id, e.Value!.ToString()!)">
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Closed</option>
+                        </select>
+                    </div>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(b.Description))
+                {
+                    <p class="text-[0.85rem] text-[#8b9dbf] leading-relaxed">@b.Description</p>
+                }
+                @if (b.Tags.Length > 0)
+                {
+                    <div class="flex gap-2">
+                        @foreach (var t in b.Tags) { <span class="text-[0.78rem] text-[#8b9dbf] font-mono">#@t</span> }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    string statusFilter = "All";
+    bool showForm;
+    string newTitle = "";
+    string newDesc = "";
+    string newProject = "";
+    string newSeverity = "High";
+    string newTagsRaw = "";
+
+    void SaveBug()
+    {
+        var tags = newTagsRaw.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        LogService.AddBug(newTitle.Trim(), newDesc.Trim(), newProject.Trim(), newSeverity, tags);
+        newTitle = ""; newDesc = ""; newProject = ""; newTagsRaw = ""; showForm = false;
+    }
+
+    string SeverityClass(string s) => s switch
+    {
+        "Critical" => "bg-[rgba(255,122,138,0.2)] text-[#ff7a8a]",
+        "High"     => "bg-[rgba(255,159,122,0.2)] text-[#ff9f7a]",
+        "Medium"   => "bg-[rgba(245,205,99,0.2)] text-[#f5cd63]",
+        _          => "bg-[rgba(139,157,191,0.15)] text-[#8b9dbf]"
+    };
+
+    protected override void OnInitialized() => LogService.OnBugChanged += Refresh;
+    void Refresh() => InvokeAsync(StateHasChanged);
+    public void Dispose() => LogService.OnBugChanged -= Refresh;
+}

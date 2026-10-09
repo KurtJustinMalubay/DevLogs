@@ -11,10 +11,10 @@
             <div class="grid gap-[2px]">
                 <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/" Match="NavLinkMatch.All"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⌂</span>Home</NavLink>
                 <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/logs"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">≡</span>Logs</NavLink>
-                @foreach (var (icon, label) in Items)
-                {
-                    <button class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" @onclick="() => Ui.Show(label)"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">@icon</span>@label</button>
-                }
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/snippets"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">{ }</span>Snippets</NavLink>
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/bugs"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⚑</span>Bug tracker</NavLink>
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/tags"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">#</span>Tags</NavLink>
+                <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/timeline"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">◷</span>Timeline</NavLink>
                 <NavLink class="group flex items-center gap-[.7rem] p-[.55rem_.75rem] rounded-[8px] text-[#8b9dbf] text-left font-medium w-full hover:bg-[#131e32] hover:text-[#e8eefb] hover:no-underline [&.active]:bg-[#1a2843] [&.active]:text-[#e8eefb]" href="/settings"><span class="w-[1.3rem] text-center font-mono text-[.9rem] group-[.active]:text-[#5eead4]">⚙</span>Settings</NavLink>
             </div>
             <div class="mt-auto grid grid-cols-[auto_1fr] gap-[.1rem_.7rem] items-center pt-[1rem] border-t border-[#243452]">
@@ -39,12 +39,6 @@
 <SearchModal />
 
 @code {
-    static readonly (string Icon, string Label)[] Items =
-    [
-        ("{ }", "Snippets"), ("⚑", "Bug tracker"),
-        ("#", "Tags"), ("◷", "Timeline")
-    ];
-
     protected override void OnInitialized()
     {
         if (!Auth.IsAuthenticated) Nav.NavigateTo("/login");
